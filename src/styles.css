@@ -1,0 +1,187 @@
+/* Botão Adicionar ao Card.Ai — a superfície de personalização.
+   Nenhum style inline: as variáveis são lidas com fallback, então o parceiro
+   sobrescreve de qualquer lugar da árvore — CSS comum, Tailwind arbitrário
+   ([--cardai-bg:#1F6F66]) ou uma classe própria no lugar da nossa. */
+
+/* Antes do custom element subir, o que estiver dentro não aparece. */
+card-ai-button:not(:defined) { display: none; }
+
+.cardai-btn {
+  --cardai-disc: calc(var(--cardai-size, 56px) - 8px);
+  --cardai-mark-size: calc(var(--cardai-disc) * 0.62);
+
+  box-sizing: border-box;
+  height: var(--cardai-size, 56px);
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--cardai-radius, 999px);
+  background: var(--cardai-bg, #C74D52);
+  color: var(--cardai-fg, #ffffff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cardai-gap, 10px);
+  padding: 4px var(--cardai-pad, 18px) 4px 4px;
+  cursor: pointer;
+  font-family: var(--cardai-font, inherit);
+  font-size: var(--cardai-text, calc(var(--cardai-size, 56px) / 3.7));
+  font-weight: var(--cardai-weight, 600);
+  line-height: 1;
+  box-shadow: var(--cardai-shadow, 0 8px 20px rgba(5, 17, 39, 0.18));
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.cardai-btn:hover { transform: translateY(-1px); }
+.cardai-btn:active { transform: translateY(0); }
+.cardai-btn:focus-visible { outline: 2px solid var(--cardai-ring, #051127); outline-offset: 2px; }
+
+/* Só a marca: vira um círculo do tamanho cheio. */
+.cardai-btn[data-icon-only] { padding: 4px; gap: 0; width: var(--cardai-size, 56px); }
+
+/* Sem marca: o respiro da esquerda existia para o disco. */
+.cardai-btn[data-no-mark] { padding: 4px var(--cardai-pad, 18px); gap: 0; }
+
+.cardai-disc {
+  width: var(--cardai-disc);
+  height: var(--cardai-disc);
+  border-radius: var(--cardai-disc-radius, calc(var(--cardai-radius, 999px) - 3px));
+  background: var(--cardai-mark-bg, #ffffff);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.cardai-mark { width: var(--cardai-mark-size); height: var(--cardai-mark-size); display: block; object-fit: contain; }
+.cardai-label { white-space: nowrap; }
+
+/* Atalhos de tamanho, para quem não quer mexer em variável. */
+.cardai-btn[data-size="sm"] { --cardai-size: 40px; --cardai-pad: 14px; --cardai-gap: 8px; }
+.cardai-btn[data-size="md"] { --cardai-size: 56px; }
+.cardai-btn[data-size="lg"] { --cardai-size: 72px; --cardai-pad: 24px; --cardai-gap: 13px; }
+
+/* Variantes. */
+.cardai-btn[data-variant="outline"] {
+  --cardai-mark-bg: transparent;
+  --cardai-shadow: none;
+  background: transparent;
+  color: var(--cardai-bg, #C74D52);
+  border: 1.5px solid var(--cardai-bg, #C74D52);
+}
+.cardai-btn[data-variant="ghost"] {
+  --cardai-mark-bg: transparent;
+  --cardai-shadow: none;
+  background: transparent;
+  color: var(--cardai-bg, #C74D52);
+}
+
+/* Preset co-marca: pega a cor do texto do container. Um parceiro com tema
+   próprio não configura nada. */
+.cardai-btn[data-brand="host"] { --cardai-bg: currentColor; --cardai-radius: 10px; --cardai-shadow: none; }
+
+/* Preset discreto: um link com a marca, para listas e tabelas. */
+.cardai-inline {
+  --cardai-mark-size: var(--cardai-mark, 1.35em);
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 44px;
+  color: var(--cardai-bg, #C74D52);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cardai-gap, 0.5em);
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--cardai-weight, 600);
+  text-decoration: none;
+}
+.cardai-inline:hover { text-decoration: underline; }
+.cardai-inline:focus-visible { outline: 2px solid var(--cardai-ring, #051127); outline-offset: 2px; }
+
+/* Tema escuro: o disco inverte para manter contraste. */
+.cardai-btn[data-theme="dark"] { --cardai-bg: #ffffff; --cardai-fg: #051127; --cardai-mark-bg: #F4F4F4; }
+@media (prefers-color-scheme: dark) {
+  .cardai-btn[data-theme="auto"] { --cardai-bg: #ffffff; --cardai-fg: #051127; --cardai-mark-bg: #F4F4F4; }
+}
+
+/* Estados. */
+.cardai-btn[data-cardai-state="busy"] { opacity: 0.72; cursor: progress; }
+/* Sucesso não troca cor nenhuma. Duas razões: --cardai-bg pode vir inline
+   pelo atributo color e ganharia daqui; e uma cor de estado própria cria um
+   par de contraste novo contra um preenchimento que é do parceiro. O check
+   herda currentColor, então é tão legível quanto o rótulo do lado. */
+.cardai-btn[data-cardai-state="done"] { cursor: pointer; }
+.cardai-check {
+  width: var(--cardai-mark-size);
+  height: var(--cardai-mark-size);
+  display: block;
+  /* Dentro do disco o par de contraste é contra --cardai-mark-bg, que é a
+     superfície clara onde a marca já vive. Navy passa contra qualquer claro. */
+  color: var(--cardai-check, #051127);
+}
+/* Sem disco, o check está sobre o preenchimento: vale a cor do rótulo, que
+   é o único par que o parceiro é obrigado a garantir. */
+.cardai-btn[data-no-mark] .cardai-check { margin-inline-end: 0.45em; color: currentColor; }
+.cardai-inline .cardai-check { color: currentColor; }
+.cardai-btn:disabled { cursor: not-allowed; }
+
+.cardai-spinner {
+  width: calc(var(--cardai-mark-size) * 0.8);
+  height: calc(var(--cardai-mark-size) * 0.8);
+  border-radius: 999px;
+  border: 2.5px solid rgba(5, 17, 39, 0.18);
+  border-top-color: currentColor;
+  color: var(--cardai-bg, #C74D52);
+  animation: cardai-spin 700ms linear infinite;
+}
+/* Fora do disco branco, o giro é da cor do rótulo. */
+.cardai-btn[data-no-mark] .cardai-spinner {
+  color: inherit;
+  border-color: rgba(127, 127, 127, 0.3);
+  border-top-color: currentColor;
+  margin-inline-end: 0.5em;
+}
+
+@keyframes cardai-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .cardai-spinner { animation-duration: 2.4s; }
+  .cardai-btn:hover { transform: none; }
+}
+
+/* Menu de destino: só com actions="both", e só para quem já está logado. */
+.cardai-root { position: relative; display: inline-flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.cardai-scrim { position: fixed; inset: 0; border: 0; background: transparent; z-index: 20; }
+.cardai-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 21;
+  min-width: 240px;
+  max-height: 280px;
+  overflow: auto;
+  background: var(--cardai-menu-bg, #ffffff);
+  border-radius: var(--cardai-menu-radius, 16px);
+  padding: 8px;
+  box-shadow: 0 16px 40px rgba(5, 17, 39, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cardai-menu-item {
+  border: 0;
+  background: transparent;
+  color: var(--cardai-menu-fg, #051127);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-height: 44px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cardai-menu-item:hover { background: var(--cardai-menu-hover, #F4F4F4); }
+.cardai-menu-label { margin: 8px 12px 2px; font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #051127; opacity: 0.6; }
+.cardai-note { font: inherit; font-size: 13px; line-height: 1.4; color: #051127; }
+.cardai-note[data-tone="error"] { color: #A73544; max-width: 280px; }
+.cardai-note a { color: inherit; }
