@@ -45,5 +45,5 @@
   "keywords": ["cardai", "flashcards", "spaced-repetition", "react"],
   "repository": { "type": "git", "url": "git+https://github.com/CardAi-App/cardai-sdk.git" },
   "homepage": "https://cardai.app",
-  "publishConfig": { "access": "public", "provenance": true }
+  "publishConfig": { "access": "public" }
 }
