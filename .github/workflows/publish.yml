@@ -3,6 +3,8 @@ name: publish
 on:
   push:
     tags: ['v*']
+  # Para repetir uma publicação que falhou sem ter de mexer na tag.
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -16,6 +18,9 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+      # Node 22 traz npm 10, e trusted publishing (OIDC) só existe a partir do
+      # 11.5.1 — sem isto o publish falha mesmo com o publisher configurado.
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
