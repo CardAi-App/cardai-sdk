@@ -43,7 +43,7 @@
     "vitest": "^2.1.8"
   },
   "keywords": ["cardai", "flashcards", "spaced-repetition", "react"],
-  "repository": { "type": "git", "url": "git+https://github.com/CardAi/cardai-sdk.git" },
+  "repository": { "type": "git", "url": "git+https://github.com/CardAi-App/cardai-sdk.git" },
   "homepage": "https://cardai.app",
   "publishConfig": { "access": "public", "provenance": true }
 }
