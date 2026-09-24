@@ -45,6 +45,9 @@ botao.onclick = () => addToCardAi({ deckName: 'Mitose', text });
 
 ## Ou use o nosso
 
+**[Editor do botão](https://cardai.app/developers)**: ajuste cor,
+tamanho, rótulo e estilo vendo o preview, e copie o código pronto (HTML ou React).
+
 ```tsx
 import { CardAiButton } from '@cardai/sdk/react';
 import '@cardai/sdk/styles.css';

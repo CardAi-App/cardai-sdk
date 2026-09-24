@@ -1,11 +1,16 @@
 {
   "name": "@cardai/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adicione flashcards ao Card.Ai a partir do seu app.",
   "license": "MIT",
   "type": "module",
-  "sideEffects": ["*.css"],
-  "files": ["dist", "src/styles.css"],
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "src/styles.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -33,7 +38,9 @@
     "react": ">=17"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true }
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
@@ -42,8 +49,18 @@
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },
-  "keywords": ["cardai", "flashcards", "spaced-repetition", "react"],
-  "repository": { "type": "git", "url": "git+https://github.com/CardAi-App/cardai-sdk.git" },
+  "keywords": [
+    "cardai",
+    "flashcards",
+    "spaced-repetition",
+    "react"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CardAi-App/cardai-sdk.git"
+  },
   "homepage": "https://cardai.app",
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }
