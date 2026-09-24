@@ -42,7 +42,8 @@ export function CardAiButton({
     <span className="cardai-root">
       <button
         type="button"
-        onClick={added && deckId ? () => location.assign(`https://cardai.app/flashcard/${deckId}`) : add}
+        // Aba nova: a página do parceiro fica onde está.
+        onClick={added && deckId ? () => window.open(`https://cardai.app/flashcard/${deckId}`, '_blank', 'noopener') : add}
         disabled={busy}
         aria-label={shown || 'Adicionar ao Card.Ai'}
         className={[unstyled ? '' : 'cardai-btn', className].filter(Boolean).join(' ')}
