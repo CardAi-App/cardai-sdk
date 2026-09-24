@@ -1,6 +1,8 @@
 import type { AddOptions, AddOutcome, AddResult } from './types.js';
 
-const API = 'https://api.cardai.app';
+// api.cardai.app não existe no DNS: o backend responde no domínio do Railway
+// até o domínio próprio ser criado.
+const API = 'https://backend-v2-production-e3a6.up.railway.app';
 const APP = 'https://cardai.app';
 const POPUP = 'popup,width=440,height=720';
 

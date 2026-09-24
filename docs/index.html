@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste do botão Card.Ai</title>
+<!-- O add.js de produção, como um parceiro de verdade carregaria. -->
+<script src="https://cardai.app/add.js" defer></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: #111; }
+  body { font: 15px/1.5 system-ui, -apple-system, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 48px 16px 80px; display: flex; flex-direction: column; gap: 32px; }
+  h1 { font-size: 20px; margin: 0; }
+  p { margin: 0; color: #666; }
+  form { display: flex; flex-direction: column; gap: 14px; }
+  label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; }
+  input, select, textarea { font: inherit; font-weight: 400; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #111; }
+  textarea { min-height: 140px; font-family: ui-monospace, monospace; font-size: 13px; }
+  .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .apply { align-self: flex-start; font: inherit; padding: 8px 16px; border: 1px solid #111; border-radius: 8px; background: #fff; cursor: pointer; }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+  .own { font: inherit; padding: 10px 18px; border: 1px solid #111; border-radius: 6px; background: #fff; cursor: pointer; }
+  .own[data-cardai-state="busy"] { opacity: .5; }
+  #log { margin: 0; padding: 12px; min-height: 48px; background: #fafafa; border-radius: 8px; font: 12px/1.6 ui-monospace, monospace; white-space: pre-wrap; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <div>
+    <h1>Teste do botão Adicionar ao Card.Ai</h1>
+    <p>Página de fora do Card.Ai, como a de um parceiro. O clique é real: cria de verdade na sua conta.</p>
+  </div>
+
+  <form id="f">
+    <div class="row">
+      <label>Nome do deck<input name="deckName" value="Teste do botão"></label>
+      <label>Destino
+        <select name="actions">
+          <option value="create">Criar um deck</option>
+          <option value="append">Juntar a um deck</option>
+          <option value="both">Deixar escolher</option>
+        </select>
+      </label>
+    </div>
+    <label>Conteúdo
+      <select name="mode">
+        <option value="cards">Flashcards prontos</option>
+        <option value="prompt">Prompt para a IA</option>
+      </select>
+    </label>
+    <label id="cardsField">Flashcards (pergunta :: resposta, ou {{lacuna}})
+      <textarea name="text">O que é mitose? :: Divisão celular que gera duas células iguais.
+Quantas fases tem a mitose? :: Quatro: prófase, metáfase, anáfase e telófase.
+A meiose reduz o número de cromossomos {{pela metade}}.
+Qual fase separa as cromátides-irmãs? :: Anáfase.</textarea>
+    </label>
+    <label id="promptField" hidden>Prompt
+      <textarea name="prompt">Crie flashcards curtos sobre mitose para o ensino médio.</textarea>
+    </label>
+    <button class="apply" type="submit">Aplicar</button>
+  </form>
+
+  <div class="stage" id="stage"></div>
+
+  <div>
+    <p style="margin-bottom: 8px">O que a janela do Card.Ai avisou:</p>
+    <pre id="log">Nada ainda.</pre>
+  </div>
+</main>
+
+<script>
+  var form = document.getElementById('f');
+  var stage = document.getElementById('stage');
+  var log = document.getElementById('log');
+
+  function render() {
+    var d = new FormData(form);
+    var prompt = d.get('mode') === 'prompt';
+    document.getElementById('cardsField').hidden = prompt;
+    document.getElementById('promptField').hidden = !prompt;
+
+    // O custom element lê tudo ao entrar no DOM: cada "Aplicar" monta de novo.
+    stage.replaceChildren();
+    [['card-ai-button', null], ['button', 'Meu próprio botão (data-cardai)']].forEach(function (pair) {
+      var el = document.createElement(pair[0]);
+      if (pair[1]) { el.className = 'own'; el.type = 'button'; el.setAttribute('data-cardai', ''); el.textContent = pair[1]; }
+      el.setAttribute('deck-name', d.get('deckName'));
+      el.setAttribute('actions', d.get('actions'));
+      if (prompt) {
+        el.setAttribute('mode', 'prompt');
+        el.setAttribute('prompt', d.get('prompt'));
+      } else {
+        var block = document.createElement('script');
+        block.type = 'text/cardai';
+        block.textContent = d.get('text');
+        el.appendChild(block);
+      }
+      stage.appendChild(el);
+    });
+  }
+
+  form.addEventListener('change', function (e) { if (e.target.name === 'mode') render(); });
+  form.addEventListener('submit', function (e) { e.preventDefault(); render(); });
+
+  // A janela avisa quem abriu quando termina (sucesso ou erro).
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://cardai.app' || !e.data || e.data.type !== 'cardai:add') return;
+    var line = new Date().toLocaleTimeString() + '  ' + e.data.status + (e.data.deckId ? '  deck ' + e.data.deckId : '');
+    log.textContent = log.textContent === 'Nada ainda.' ? line : log.textContent + '\n' + line;
+  });
+  function note(text) {
+    var line = new Date().toLocaleTimeString() + '  ' + text;
+    log.textContent = log.textContent === 'Nada ainda.' ? line : log.textContent + '\n' + line;
+  }
+  document.addEventListener('cardai:done', function () { note('botão: adicionado'); });
+  document.addEventListener('cardai:closed', function () { note('botão: janela fechada sem adicionar'); });
+  document.addEventListener('cardai:error', function (e) {
+    log.textContent = new Date().toLocaleTimeString() + '  erro no envio: ' + (e.detail && e.detail.message);
+  });
+
+  render();
+</script>
+</body>
+</html>
